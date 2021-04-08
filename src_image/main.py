@@ -1,9 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow import keras
-
 import numpy as np
-import matplotlib.pyplot as plt
 import mlflow
 import mlflow.tensorflow
 
