@@ -1,41 +1,42 @@
+import os
 import numpy as np
-import pandas as pd
+import tensorflow as tf
+import tensorflow_hub as hub
+import tensorflow_datasets as tfds
+import mlflow
 import pickle
 from datasets import load_dataset
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
-import mlflow
-dataset = load_dataset('allocine')
-print("datasets loaded")
 
-# Reviews need to be tokenized
-X_train = np.array(dataset["train"]['review'])
-X_val = np.array(dataset["validation"]['review'])
-X_test = np.array(dataset["test"]['review'])
+# Split the training set into 60% and 40% to end up with 15,000 examples
+# for training, 10,000 examples for validation and 25,000 examples for testing.
 
-y_train = dataset["train"]['label']
-y_val = dataset["validation"]['label']
-y_test = dataset["test"]['label']
-class_names = ['Positive','Negative']
+train_data, validation_data, test_data = tfds.load(
+    name="imdb_reviews", 
+    split=('train[:60%]', 'train[60%:]', 'test'),
+    as_supervised=True)
+
+print('data loaded')
 
 # enable autologging
-mlflow.sklearn.autolog()
+mlflow.tensorflow.autolog()
 
-tfidf_clf = Pipeline([
-    ('tfidf', TfidfVectorizer(
-        lowercase=True, ngram_range=(1, 2),
-        max_df=0.75
-    )),
-    ('clf', LogisticRegression(
-        C=1300, penalty='l2', 
-        n_jobs=-1, verbose=1
-    )),
-])
+embedding = "https://tfhub.dev/google/nnlm-en-dim50/2"
+hub_layer = hub.KerasLayer(embedding, input_shape=[], 
+                           dtype=tf.string, trainable=True)
 
+
+model = tf.keras.Sequential()
+model.add(hub_layer)
+model.add(tf.keras.layers.Dense(16, activation='relu'))
+model.add(tf.keras.layers.Dense(1))
+
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+              metrics=['accuracy'])
 
 print("training")
 with mlflow.start_run() as run:
-    for i in range(2):
-        tfidf_clf.fit(X_train, y_train)
-
+    history = model.fit(train_data.shuffle(10000).batch(512),
+                        epochs=10,
+                        validation_data=validation_data.batch(512),
+                        verbose=1)
