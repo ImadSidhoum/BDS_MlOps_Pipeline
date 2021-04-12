@@ -185,6 +185,16 @@ if __name__ == "__main__":
     #print(obj)
     #dezip('az.zip', 'python25')
 
-
-    obj.FileDownload(f_id, f_name)
+    i = int(input("Enter your choice:1 - Download file, 2- Upload File, 3- Exit.\n"))
+        
+    if i == 1:
+        f_id = input("Enter file id: ")
+        f_name = input("Enter file name: ")
+        obj.FileDownload(f_id, f_name)
             
+    elif i == 2:
+        f_path = input("Enter full file path: ")
+        obj.FileUpload(f_path)
+        
+    else:
+        exit()

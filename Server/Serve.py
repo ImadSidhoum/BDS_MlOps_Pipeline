@@ -5,10 +5,13 @@ import json
 import time
 import sys
 import mlflow
+from utils import *
 
 app = FastAPI()
+obj = DriveAPI()
 
-logged_model = './../../BDS_MlOps_Pipeline/src_image/mlruns/0/fb9fee4e492b4dbaad0cf10106e60151/artifacts/model'
+
+logged_model = './../src_image/mlruns/0/fb9fee4e492b4dbaad0cf10106e60151/artifacts/model'
 
 # Load model as a PyFuncModel.
 loaded_model = mlflow.pyfunc.load_model(logged_model)
@@ -17,7 +20,7 @@ class Item(BaseModel):
     images: list
 
 class Item_uri(BaseModel):
-    uri: str
+    name: str
 
 @app.get('/')
 async def index():
@@ -29,7 +32,12 @@ async def predict(item: Item):
     res = loaded_model.predict(images).tolist()
     return res
 
-@app.post('/model')
+@app.post('/update')
 async def model_update(item: Item_uri):
-    uri = item.uri
-    loaded_model = mlflow.pyfunc.load_model(uri)
+    f_name = item.name
+    obj.FileDownload(f_name)
+
+    dezip(f_name, 'model')
+    loaded_model = mlflow.pyfunc.load_model('model')
+    return "model updated"
+
