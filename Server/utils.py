@@ -177,24 +177,23 @@ class DriveAPI:
             # Raise UploadError if file is not uploaded.
             raise UploadError("Can't Upload File.")
   
-if __name__ == "__main__":
-    obj = DriveAPI()
-    dir = 'code.zip'
-    #zipdirectory(dir, 'C:\BDS_MlOps_Pipeline')
-    #obj.FileUpload(dir)
-    #print(obj)
-    #dezip('az.zip', 'python25')
+def compare(new_run_id):
+    json_response = requests.get(f'http://127.0.0.1:5001/version')
+    old_run_id = json_response.text 
+    new_run_info = mlflow.get_run(run_id=new_run_id)
+    try: 
+        lod_run_info = mlflow.get_run(run_id=old_run_id)
 
-    i = int(input("Enter your choice:1 - Download file, 2- Upload File, 3- Exit.\n"))
-        
-    if i == 1:
-        f_id = input("Enter file id: ")
-        f_name = input("Enter file name: ")
-        obj.FileDownload(f_id, f_name)
-            
-    elif i == 2:
-        f_path = input("Enter full file path: ")
-        obj.FileUpload(f_path)
-        
-    else:
-        exit()
+        new_acc = new_run_info.data.metrics['training_score']
+        old_acc = old_run_info.data.metrics['training_score']
+
+        if (new_acc>old_acc):
+            f_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+            zipdirectory(f_name+'.zip', './../src_image/mlruns/0/'+new_run_id+'/artifacts/model')
+            FileUpload(f_name+'.zip')
+            data = json.dumps({"signature_name": "serving_default", "name": f_name+'.zip',"version":str(new_run_id)})
+            headers = {"content-type": "application/json"}
+            json_response = requests.post(f'http://127.0.0.1:5001/update', data=data, headers=headers)
+            print(json_response)
+    except:
+        print('something went wrong')
