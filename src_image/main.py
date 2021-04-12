@@ -1,9 +1,10 @@
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
 import numpy as np
-import mlflow
+import sys
 import mlflow.tensorflow
-from 'Server/utils' import *
+sys.path.insert(0, '../Server')
+from utils import *
 mlflow.tensorflow.autolog()
 
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
@@ -24,8 +25,8 @@ fashion_mnist_labels = ["T-shirt/top",  # index 0
 x_train = x_train.astype('float32') / 255
 x_test = x_test.astype('float32') / 255
 
-(x_train, x_valid) = x_train[5000:], x_train[:5000]
-(y_train, y_valid) = y_train[5000:], y_train[:5000]
+(x_train, x_valid) = x_train[500:], x_train[:500]
+(y_train, y_valid) = y_train[500:], y_train[:500]
 
 # Reshape input data from (28, 28) to (28, 28, 1)
 w, h = 28, 28
@@ -72,7 +73,7 @@ with mlflow.start_run() as run:
     model.fit(x_train,
              y_train,
              batch_size=128,
-             epochs=1,
+             epochs=2,
              validation_data=(x_valid, y_valid),
              callbacks=[checkpointer])
     #mlflow.keras.log_model(model, "models")

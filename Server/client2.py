@@ -1,8 +1,9 @@
 import requests
 import json
 
-data = json.dumps({"signature_name": "serving_default", "name": "code.zip", "version": "1"})
-headers = {"content-type": "application/json"}
-json_response = requests.post(f'http://127.0.0.1:5001/update', data=data, headers=headers)
+#data = json.dumps({"signature_name": "serving_default", "name": "code.zip", "version": "1"})
+#headers = {"content-type": "application/json"}
+#json_response = requests.post(f'http://127.0.0.1:5001/update', data=data, headers=headers)
 #js = json.loads(json_response.text)
-print(json_response)
+json_response= requests.get(f'http://127.0.0.1:5001/version')
+print(type(json_response.text))

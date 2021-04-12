@@ -11,10 +11,14 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
+import time, json
 
 import zipfile
 import os.path
 import glob
+
+import mlflow
+
 
 def zipdirectory(filezip, pathzip):
     lenpathparent = len(pathzip)+1   ## utile si on veut stocker les chemins relatifs
@@ -176,22 +180,32 @@ class DriveAPI:
               
             # Raise UploadError if file is not uploaded.
             raise UploadError("Can't Upload File.")
+
+def update_model(new_run_id,obj):
+    f_name = str(hash(time.time()))
+    zipdirectory(f_name + '.zip', './../src_image/mlruns/0/' + new_run_id + '/artifacts/model')
+    obj.FileUpload(f_name + '.zip')
+    os.remove(f_name + '.zip')
+    data = json.dumps({"signature_name": "serving_default", "name": f_name + '.zip', "version": str(new_run_id)})
+    headers = {"content-type": "application/json"}
+    json_response = requests.post(f'http://127.0.0.1:5001/update', data=data, headers=headers)
+    return json_response
   
-def compare(new_run_id, metric='training_score'):
+def compare(new_run_id, metric='accuracy'):
+    obj = DriveAPI()
     json_response = requests.get(f'http://127.0.0.1:5001/version')
-    old_run_id = json_response.text 
+    old_run_id = json_response.text
     new_run_info = mlflow.get_run(run_id=new_run_id)
-    try: 
-        lod_run_info = mlflow.get_run(run_id=old_run_id)
-        new_acc = new_run_info.data.metrics[metric]
-        old_acc = old_run_info.data.metrics[metric]
-        if (new_acc>old_acc):
-            f_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-            zipdirectory(f_name+'.zip', './../src_image/mlruns/0/'+new_run_id+'/artifacts/model')
-            FileUpload(f_name+'.zip')
-            data = json.dumps({"signature_name": "serving_default", "name": f_name+'.zip',"version":str(new_run_id)})
-            headers = {"content-type": "application/json"}
-            json_response = requests.post(f'http://127.0.0.1:5001/update', data=data, headers=headers)
-            print(json_response)
-    except:
-        print('something went wrong')
+
+    if old_run_id == "null":
+        update_model(new_run_id, obj)
+        return
+
+    print(old_run_id[1:-1])
+    old_run_info = mlflow.get_run(run_id=old_run_id[1:-1])
+    new_acc = new_run_info.data.metrics[metric]
+    old_acc = old_run_info.data.metrics[metric]
+    if (new_acc>old_acc):
+        print("enter")
+        json_response = update_model(new_run_id, obj)
+        print(json_response)
