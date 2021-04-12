@@ -176,15 +176,13 @@ class DriveAPI:
               
             # Raise UploadError if file is not uploaded.
             raise UploadError("Can't Upload File.")
-  
+
+import sys
 if __name__ == "__main__":
     obj = DriveAPI()
     dir = 'code.zip'
-    #zipdirectory(dir, 'C:\BDS_MlOps_Pipeline')
-    #obj.FileUpload(dir)
+    zipdirectory(dir, sys.argv[1])
+    obj.FileUpload(dir)
     #print(obj)
     #dezip('az.zip', 'python25')
-
-
-    obj.FileDownload(f_id, f_name)
             
