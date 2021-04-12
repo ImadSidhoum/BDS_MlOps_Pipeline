@@ -181,16 +181,19 @@ def compare(new_run_id):
     json_response = requests.get(f'http://127.0.0.1:5001/version')
     old_run_id = json_response.text 
     new_run_info = mlflow.get_run(run_id=new_run_id)
-    lod_run_info = mlflow.get_run(run_id=old_run_id)
+    try: 
+        lod_run_info = mlflow.get_run(run_id=old_run_id)
 
-    new_acc = new_run_info.data.metrics['training_score']
-    old_acc = old_run_info.data.metrics['training_score']
+        new_acc = new_run_info.data.metrics['training_score']
+        old_acc = old_run_info.data.metrics['training_score']
 
-    if (new_acc>old_acc):
-        f_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-        zipdirectory(f_name+'.zip', './../src_image/mlruns/0/'+new_run_id+'/artifacts/model')
-        FileUpload(f_name+'.zip')
-        data = json.dumps({"signature_name": "serving_default", "name": f_name+'.zip',"version":str(new_run_id)})
-        headers = {"content-type": "application/json"}
-        json_response = requests.post(f'http://127.0.0.1:5001/update', data=data, headers=headers)
-        print(json_response)
+        if (new_acc>old_acc):
+            f_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+            zipdirectory(f_name+'.zip', './../src_image/mlruns/0/'+new_run_id+'/artifacts/model')
+            FileUpload(f_name+'.zip')
+            data = json.dumps({"signature_name": "serving_default", "name": f_name+'.zip',"version":str(new_run_id)})
+            headers = {"content-type": "application/json"}
+            json_response = requests.post(f'http://127.0.0.1:5001/update', data=data, headers=headers)
+            print(json_response)
+    except:
+        print('something went wrong')
