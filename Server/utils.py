@@ -177,16 +177,14 @@ class DriveAPI:
             # Raise UploadError if file is not uploaded.
             raise UploadError("Can't Upload File.")
   
-def compare(new_run_id):
+def compare(new_run_id, metric='training_score'):
     json_response = requests.get(f'http://127.0.0.1:5001/version')
     old_run_id = json_response.text 
     new_run_info = mlflow.get_run(run_id=new_run_id)
     try: 
         lod_run_info = mlflow.get_run(run_id=old_run_id)
-
-        new_acc = new_run_info.data.metrics['training_score']
-        old_acc = old_run_info.data.metrics['training_score']
-
+        new_acc = new_run_info.data.metrics[metric]
+        old_acc = old_run_info.data.metrics[metric]
         if (new_acc>old_acc):
             f_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
             zipdirectory(f_name+'.zip', './../src_image/mlruns/0/'+new_run_id+'/artifacts/model')
