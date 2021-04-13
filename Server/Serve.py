@@ -40,7 +40,6 @@ async def index():
 async def model_update(item: Item_uri):
     f_name = item.name
     type = item.type
-    print ('here')
     meta_data = dict(
         last_f_name = f_name,
         last_version = item.version

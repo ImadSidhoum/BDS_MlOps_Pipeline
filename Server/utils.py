@@ -181,7 +181,7 @@ class DriveAPI:
             # Raise UploadError if file is not uploaded.
             raise UploadError("Can't Upload File.")
 
-def update_model(new_run_id,obj):
+def update_model(new_run_id,obj,type):
     #f_name = str(hash(time.time()))
     date = datetime.datetime.now()
     f_name = str(date.strftime("%m-%d-%y_%X"))
@@ -192,18 +192,18 @@ def update_model(new_run_id,obj):
         zipdirectory(f_name + '.zip', './../src_text/mlruns/0/' + new_run_id + '/artifacts/model')
     obj.FileUpload(f_name + '.zip')
     os.remove(f_name + '.zip')
-    data = json.dumps({"signature_name": "serving_default", "name": f_name + '.zip', "version": str(new_run_id),type:type})
+    data = json.dumps({"signature_name": "serving_default", "name": f_name + '.zip', "version": str(new_run_id),'type':str(type)})
     headers = {"content-type": "application/json"}
-    json_response = requests.post(f'http://127.0.0.1:5002/update', data=data, headers=headers)
+    json_response = requests.post(f'http://127.0.0.1:5001/update', data=data, headers=headers)
     return json_response
   
 def compare(new_run_id, metric='accuracy',type='image'):
     obj = DriveAPI()
     if type == 'image':
-        json_response = requests.get(f'http://127.0.0.1:5002/versionImageClassification')
+        json_response = requests.get(f'http://127.0.0.1:5001/versionImageClassification')
     else: 
         print('text entred')
-        json_response = requests.get(f'http://127.0.0.1:5002/versionTextClassification')
+        json_response = requests.get(f'http://127.0.0.1:5001/versionTextClassification')
     old_run_id = json_response.text
     new_run_info = mlflow.get_run(run_id=new_run_id)
 

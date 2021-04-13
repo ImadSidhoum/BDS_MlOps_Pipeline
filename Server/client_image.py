@@ -30,7 +30,7 @@ images = x_test[:10].tolist()
 
 data = json.dumps({"signature_name": "serving_default", "images": images})
 headers = {"content-type": "application/json"}
-json_response = requests.post(f'http://127.0.0.1:5002/predictImageClassification', data=data, headers=headers)
+json_response = requests.post(f'http://127.0.0.1:5001/predictImageClassification', data=data, headers=headers)
 js = json_response.text 
 if js:
     predictions = js
