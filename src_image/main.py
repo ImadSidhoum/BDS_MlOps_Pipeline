@@ -78,5 +78,5 @@ with mlflow.start_run() as run:
              callbacks=[checkpointer])
     #mlflow.keras.log_model(model, "models")
 
-compare(run_uuid)  
+compare(run_uuid,type='image')   
 print('fin')

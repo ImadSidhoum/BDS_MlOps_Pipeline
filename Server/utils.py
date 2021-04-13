@@ -186,22 +186,29 @@ def update_model(new_run_id,obj):
     date = datetime.datetime.now()
     f_name = str(date.strftime("%m-%d-%y_%X"))
     f_name = f_name.replace(":","-")
-    zipdirectory(f_name + '.zip', './../src_image/mlruns/0/' + new_run_id + '/artifacts/model')
+    if type == 'image':
+        zipdirectory(f_name + '.zip', './../src_image/mlruns/0/' + new_run_id + '/artifacts/model')
+    else:
+        zipdirectory(f_name + '.zip', './../src_text/mlruns/0/' + new_run_id + '/artifacts/model')
     obj.FileUpload(f_name + '.zip')
     os.remove(f_name + '.zip')
-    data = json.dumps({"signature_name": "serving_default", "name": f_name + '.zip', "version": str(new_run_id)})
+    data = json.dumps({"signature_name": "serving_default", "name": f_name + '.zip', "version": str(new_run_id),type:type})
     headers = {"content-type": "application/json"}
-    json_response = requests.post(f'http://127.0.0.1:5001/update', data=data, headers=headers)
+    json_response = requests.post(f'http://127.0.0.1:5002/update', data=data, headers=headers)
     return json_response
   
-def compare(new_run_id, metric='accuracy'):
+def compare(new_run_id, metric='accuracy',type='image'):
     obj = DriveAPI()
-    json_response = requests.get(f'http://127.0.0.1:5001/version')
+    if type == 'image':
+        json_response = requests.get(f'http://127.0.0.1:5002/versionImageClassification')
+    else: 
+        print('text entred')
+        json_response = requests.get(f'http://127.0.0.1:5002/versionTextClassification')
     old_run_id = json_response.text
     new_run_info = mlflow.get_run(run_id=new_run_id)
 
     if old_run_id == "null":
-        update_model(new_run_id, obj)
+        update_model(new_run_id, obj,type)
         return
 
 
@@ -210,5 +217,4 @@ def compare(new_run_id, metric='accuracy'):
     old_acc = old_run_info.data.metrics[metric]
     if (new_acc>old_acc):
         print("enter")
-        json_response = update_model(new_run_id, obj)
-        print(json_response)
+        json_response = update_model(new_run_id, obj,type)
