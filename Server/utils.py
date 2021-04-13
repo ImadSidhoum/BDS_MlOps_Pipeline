@@ -11,7 +11,7 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
-import time, json
+import time, json, datetime
 
 import zipfile
 import os.path
@@ -182,7 +182,10 @@ class DriveAPI:
             raise UploadError("Can't Upload File.")
 
 def update_model(new_run_id,obj):
-    f_name = str(hash(time.time()))
+    #f_name = str(hash(time.time()))
+    date = datetime.datetime.now()
+    f_name = str(date.strftime("%m-%d-%y_%X"))
+    f_name = f_name.replace(":","-")
     zipdirectory(f_name + '.zip', './../src_image/mlruns/0/' + new_run_id + '/artifacts/model')
     obj.FileUpload(f_name + '.zip')
     os.remove(f_name + '.zip')
