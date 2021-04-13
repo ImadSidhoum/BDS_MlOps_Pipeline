@@ -127,7 +127,7 @@ class DriveAPI:
         results = self.service.files().list(
             pageSize=100, fields="files(id, name)").execute()
         items = results.get('files', [])
-        print(items, type(items))
+
 
         request = self.service.files().get_media(fileId=file_id)
         fh = io.BytesIO()
@@ -204,7 +204,7 @@ def compare(new_run_id, metric='accuracy'):
         update_model(new_run_id, obj)
         return
 
-    print(old_run_id[1:-1])
+
     old_run_info = mlflow.get_run(run_id=old_run_id[1:-1])
     new_acc = new_run_info.data.metrics[metric]
     old_acc = old_run_info.data.metrics[metric]
