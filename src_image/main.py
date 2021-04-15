@@ -73,7 +73,7 @@ with mlflow.start_run() as run:
     model.fit(x_train,
              y_train,
              batch_size=128,
-             epochs=2,
+             epochs=1,
              validation_data=(x_valid, y_valid),
              callbacks=[checkpointer])
     #mlflow.keras.log_model(model, "models")

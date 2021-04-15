@@ -22,7 +22,7 @@ model_image = Model()
 model_text = Model()
 
 class Item(BaseModel):
-    images: list
+    items: list
 
 class Item_uri(BaseModel):
     name: str
@@ -69,7 +69,7 @@ async def model_update(item: Item_uri):
 async def predict(item: Item):
     if model_image.version:
         print("model found")
-        images = np.array(item.images)
+        images = np.array(item.items)
         res = model_image.model.predict(images).tolist()
         return res
     else:
@@ -85,16 +85,16 @@ async def predict(item: Item):
         model_image.version = meta_data['last_version']
 
         # Predicting
-        images = np.array(item.images)
+        images = np.array(item.items)
         res = model_image.model.predict(images).tolist()
 
         return res
 
 @app.post('/predictTextClassification')
 async def predict(item: Item):
-    if model.version:
+    if model_text.version:
         print("model found")
-        textes = np.array(item.text)
+        textes = np.array(item.items)
         res = model_text.model.predict(textes).tolist()
         return res
     else:
@@ -110,7 +110,7 @@ async def predict(item: Item):
         model_text.version = meta_data['last_version']
 
         # Predicting
-        textes = np.array(item.text)
+        textes = np.array(item.items)
         res = model_text.model.predict(textes).tolist()
 
         return res

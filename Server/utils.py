@@ -202,7 +202,6 @@ def compare(new_run_id, metric='accuracy',type='image'):
     if type == 'image':
         json_response = requests.get(f'http://127.0.0.1:5001/versionImageClassification')
     else: 
-        print('text entred')
         json_response = requests.get(f'http://127.0.0.1:5001/versionTextClassification')
     old_run_id = json_response.text
     new_run_info = mlflow.get_run(run_id=new_run_id)
@@ -216,5 +215,4 @@ def compare(new_run_id, metric='accuracy',type='image'):
     new_acc = new_run_info.data.metrics[metric]
     old_acc = old_run_info.data.metrics[metric]
     if (new_acc>old_acc):
-        print("enter")
         json_response = update_model(new_run_id, obj,type)
