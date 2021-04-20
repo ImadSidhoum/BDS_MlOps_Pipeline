@@ -1,1 +1,4 @@
-/models
+/src_text/mlruns/*
+/src_image/mlruns/*
+/Server/model_text/*
+

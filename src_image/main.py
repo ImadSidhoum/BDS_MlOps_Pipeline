@@ -72,7 +72,11 @@ with mlflow.start_run() as run:
     print("MLflow Run ID: %s" % run_uuid)
     model.fit(x_train,
              y_train,
+<<<<<<< HEAD
              batch_size=64,
+=======
+             batch_size=128,
+>>>>>>> 492c82c1d285d96a47320c14e35d96c3c6d54369
              epochs=1,
              validation_data=(x_valid, y_valid),
              callbacks=[checkpointer])

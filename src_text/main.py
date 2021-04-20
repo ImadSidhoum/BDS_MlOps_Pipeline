@@ -39,7 +39,7 @@ model.compile(optimizer='adam',
 print("training")
 with mlflow.start_run() as run:
     history = model.fit(train_data.shuffle(10000).batch(512),
-                        epochs=1,
+                        epochs=15,
                         validation_data=validation_data.batch(512),
                         verbose=1)
 

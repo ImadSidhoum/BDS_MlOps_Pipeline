@@ -27,7 +27,11 @@ list_models = List_Models()
 
 # requets
 class Item(BaseModel):
+<<<<<<< HEAD
     data: list
+=======
+    items: list
+>>>>>>> 492c82c1d285d96a47320c14e35d96c3c6d54369
 
 class Item_uri(BaseModel):
     name: str
@@ -44,6 +48,7 @@ async def index():
 
 
 
+<<<<<<< HEAD
 @app.post('/update/{name}')
 async def model_update(item: Item_uri, name):
     f_name = item.name
@@ -59,6 +64,66 @@ async def model_update(item: Item_uri, name):
     list_models.models[name].model = mlflow.pyfunc.load_model(name)
     list_models.models[name].version = item.version
     return "model updated"
+=======
+    return "model updated"
+
+
+@app.post('/predictImageClassification')
+async def predict(item: Item):
+    if model_image.version:
+        print("model found")
+        images = np.array(item.items)
+        res = model_image.model.predict(images).tolist()
+        return res
+    else:
+        print("no model found !! loadig the last model")
+        # Read YAML file
+        with open("meta_data_image.yml", 'r') as infile:
+            meta_data = yaml.load(infile)
+        f_name = meta_data['last_f_name']
+        obj.FileDownload(f_name)
+        dezip(f_name, 'model_image')
+        os.remove(f_name)
+        model_image.model = mlflow.pyfunc.load_model('model_image')
+        model_image.version = meta_data['last_version']
+
+        # Predicting
+        images = np.array(item.items)
+        res = model_image.model.predict(images).tolist()
+
+        return res
+
+@app.post('/predictTextClassification')
+async def predict(item: Item):
+    if model_text.version:
+        print("model found")
+        textes = np.array(item.items)
+        res = model_text.model.predict(textes).tolist()
+        return res
+    else:
+        print("no model found !! loadig the last model")
+        # Read YAML file
+        with open("meta_data_text.yml", 'r') as infile:
+            meta_data = yaml.load(infile)
+        f_name = meta_data['last_f_name']
+        obj.FileDownload(f_name)
+        dezip(f_name, 'model_text')
+        os.remove(f_name)
+        model_text.model = mlflow.pyfunc.load_model('model_text')
+        model_text.version = meta_data['last_version']
+
+        # Predicting
+        textes = np.array(item.items)
+        res = model_text.model.predict(textes).tolist()
+
+        return res
+        
+
+
+@app.get('/versionTextClassification')
+async def get_hash():
+    return model_text.version
+>>>>>>> 492c82c1d285d96a47320c14e35d96c3c6d54369
 
 @app.post('/predict/{name}')
 async def predict(item: Item, name):
