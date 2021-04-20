@@ -6,7 +6,7 @@ import time
 import sys
 import mlflow
 sys.path.insert(0, '..')
-from utils import *
+from atosflow.utils import *
 import os ,yaml
 
 class Model():
