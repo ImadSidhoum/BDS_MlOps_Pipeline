@@ -193,7 +193,7 @@ def update_model(new_run_id,obj,name,url):
     json_response = requests.post(f'{url}/update/{name}', data=data, headers=headers)
     return json_response
   
-def compare(new_run_id, metric='accuracy',name='image', url='http://127.0.0.1:5001'):
+def compare(new_run_id, metric='test_accuracy',name='image', url='http://127.0.0.1:5001'):
     obj = DriveAPI()
     json_response = requests.get(f'{url}/version/{name}')
     old_run_id = json_response.text
@@ -208,5 +208,4 @@ def compare(new_run_id, metric='accuracy',name='image', url='http://127.0.0.1:50
     new_acc = new_run_info.data.metrics[metric]
     old_acc = old_run_info.data.metrics[metric]
     if (new_acc>old_acc):
-        print("enter")
         json_response = update_model(new_run_id, obj,name,url)

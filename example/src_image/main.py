@@ -76,7 +76,10 @@ with mlflow.start_run() as run:
              epochs=1,
              validation_data=(x_valid, y_valid),
              callbacks=[checkpointer])
-    #mlflow.keras.log_model(model, "models")
+    results = model.evaluate(x_test,y_test,batch_size=128)
+    mlflow.log_metric("test_loss", results[0])
+    mlflow.log_metric("test_accuracy", results[1])
+print("test loss, test acc:", results)
 
-compare(run_uuid,name='image')   
+compare(run.info.run_uuid,name='image')  
 print('fin')

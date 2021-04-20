@@ -6,7 +6,7 @@ import tensorflow_datasets as tfds
 import mlflow
 import pickle,sys
 from datasets import load_dataset
-sys.path.insert(0, '../Server')
+sys.path.insert(0, '../../atosflow')
 from utils import *
 
 # Split the training set into 60% and 40% to end up with 15,000 examples
@@ -39,9 +39,14 @@ model.compile(optimizer='adam',
 print("training")
 with mlflow.start_run() as run:
     history = model.fit(train_data.shuffle(10000).batch(512),
-                        epochs=15,
+                        epochs=1,
                         validation_data=validation_data.batch(512),
                         verbose=1)
 
-compare(run.info.run_uuid,type='text')  
+    results = model.evaluate(test_data.shuffle(10000).batch(512))
+    mlflow.log_metric("test_loss", results[0])
+    mlflow.log_metric("test_accuracy", results[1])
+print("test loss, test acc:", results)
+
+compare(run.info.run_uuid,name='text')  
 print('fin')
