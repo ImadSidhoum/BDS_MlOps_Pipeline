@@ -10,5 +10,5 @@ flavors:
     env: conda.yaml
     loader_module: mlflow.keras
     python_version: 3.9.4
-run_id: 25636597be8b4662b1e23a7f622626ec
-utc_time_created: '2021-04-12 16:35:45.749787'
+run_id: 677da2558b6a4eb194116df9e10fa7d8
+utc_time_created: '2021-04-15 12:37:17.412388'
