@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, UploadFile, File
 import numpy as np
 from pydantic import BaseModel
 import json
@@ -13,6 +13,7 @@ class Model():
     def __init__(self):
         self.version = None
         self.model = None
+        self.name = None
 
 class List_Models():
     def __init__(self):
@@ -47,18 +48,20 @@ async def index():
 
 @app.post('/update/{name}')
 async def model_update(item: Item_uri, name):
+    
+    if name in list_models.models:
+        os.remove(name)
+    else:
+        list_models.models[name] = Model()
+
     f_name = item.name
     obj.FileDownload(f_name)
     dezip(f_name, name)
     os.remove(f_name)
-
-    if name in list_models.models:
-        print(f"model {name} found")
-    else:
-        list_models.models[name] = Model()
     
     list_models.models[name].model = mlflow.pyfunc.load_model(name)
     list_models.models[name].version = item.version
+    list_models.models[name].name = f_name
     return "model updated"
 
 @app.post('/predict/{name}')
@@ -75,13 +78,41 @@ async def get_hash(name):
         return list_models.models[name].version
     return None
 
+@app.post('/config/set')
+async def set_yaml(file: UploadFile = File(...)):
+    contents = await file.read()
+    meta_data = yaml.load(contents)
+    print(meta_data)
+    for name in meta_data.keys():
+        if name in list_models.models:
+            os.remove(name)
+        else:
+            list_models.models[name] = Model()
 
-if len(sys.argv) == 2:
-    with open(sys.argv[-1], 'r') as infile:
-        meta_data = yaml.load(infile)
-    f_name = meta_data['last_f_name']
-    obj.FileDownload(f_name)
-    dezip(f_name, 'model_image')
-    os.remove(f_name)
-    model_image.model = mlflow.pyfunc.load_model('model_image')
-    model_image.version = meta_data['last_version']
+        f_name = meta_data[name]["name"]
+        obj.FileDownload(f_name)
+        dezip(f_name, name)
+        os.remove(f_name)
+
+        list_models.models[name].model = mlflow.pyfunc.load_model(name)
+        list_models.models[name].version =meta_data[name]["version"]
+        list_models.models[name].name = f_name
+    return "new config set"
+
+
+
+@app.get('/config/get')
+async def get_yaml():
+    meta_data = {}
+    for elt in list_models.models.keys():
+        tmp = {}
+        tmp["name"] = list_models.models[elt].name
+        tmp["version"] =list_models.models[elt].version
+        meta_data[elt] = tmp
+    
+    with open('config.yml', 'w') as outfile:
+        yaml.dump(meta_data, outfile, default_flow_style=False)
+    
+    f = open("config.yml", "r")
+    return f.read()
+
