@@ -8,6 +8,8 @@ import mlflow
 sys.path.insert(0, '..')
 from atosflow.utils import *
 import os ,yaml
+import pickle 
+
 
 class Model():
     def __init__(self):
@@ -67,6 +69,15 @@ async def model_update(item: Item_uri, name):
 @app.post('/predict/{name}')
 async def predict(item: Item, name):
     data = np.array(item.data)
+    date = datetime.datetime.now()
+    filename = str(date.strftime("%m-%d-%y_%X"))
+    filename = filename.replace(":","-")
+    if name =='image':
+        filehandler = open('Data/image/'+filename, 'w')
+        pickle.dump(data, filehandler)
+    else:
+        filehandler = open('Data/text/'+filename, 'w')
+        pickle.dump(data, filehandler)
     res=None
     if name in list_models.models:
         res = list_models.models[name].model.predict(data).tolist()
