@@ -16,6 +16,7 @@ class Model():
         self.version = None
         self.model = None
         self.name = None
+        self.preprocess = None
 
 class List_Models():
     def __init__(self):
@@ -61,7 +62,8 @@ async def model_update(item: Item_uri, name):
     dezip(f_name, name)
     os.remove(f_name)
     
-    list_models.models[name].model = mlflow.pyfunc.load_model(name)
+    list_models.models[name].model = mlflow.pyfunc.load_model(name+'/model')
+    list_models.models[name].preprocess = pickle.load(open(name+'/preprocessing.pkl','r'))
     list_models.models[name].version = item.version
     list_models.models[name].name = f_name
     return "model updated"
@@ -80,7 +82,8 @@ async def predict(item: Item, name):
         pickle.dump(data, filehandler)
     res=None
     if name in list_models.models:
-        res = list_models.models[name].model.predict(data).tolist()
+        processed_data = list_models.models[name].preprocess.preprocess(data)
+        res = list_models.models[name].model.predict(processed_data).tolist()
     return res
     
 @app.get('/version/{name}')
@@ -106,6 +109,7 @@ async def set_yaml(file: UploadFile = File(...)):
         os.remove(f_name)
 
         list_models.models[name].model = mlflow.pyfunc.load_model(name)
+        list_models.models[name].preprocess = pickle.load(open(name+'/preprocessing.pkl','r'))
         list_models.models[name].version =meta_data[name]["version"]
         list_models.models[name].name = f_name
     return "new config set"

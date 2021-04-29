@@ -1,52 +1,44 @@
 import os
 import numpy as np
 import tensorflow as tf
-import tensorflow_hub as hub
-import tensorflow_datasets as tfds
 import mlflow
 import pickle,sys
-from datasets import load_dataset
-sys.path.insert(0, '../../atosflow')
+from tools import *
+sys.path.append('../../atosflow')
 from utils import *
 
-# Split the training set into 60% and 40% to end up with 15,000 examples
-# for training, 10,000 examples for validation and 25,000 examples for testing.
+p = Preprocessing()
 
-train_data, validation_data, test_data = tfds.load(
-    name="imdb_reviews", 
-    split=('train[:60%]', 'train[60%:]', 'test'),
-    as_supervised=True)
+X_train_transformed,X_test_transformed,X_val_transformed,y_train,y_val,y_test = p.preprocessing_text_fit('./data.csv')
 
-print('data loaded')
-
+filename = 'preprocessing.pkl'
+outfile = open(filename,'wb')
+pickle.dump(p,outfile) 
+outfile.close()
+'''
+infile = open(filename,'rb')
+new = pickle.load(infile)
+infile.close()
+'''
 # enable autologging
 mlflow.tensorflow.autolog()
-
-embedding = "https://tfhub.dev/google/nnlm-en-dim50/2"
-hub_layer = hub.KerasLayer(embedding, input_shape=[], 
-                           dtype=tf.string, trainable=True)
-
-
 model = tf.keras.Sequential()
-model.add(hub_layer)
 model.add(tf.keras.layers.Dense(16, activation='relu'))
 model.add(tf.keras.layers.Dense(1))
-
 model.compile(optimizer='adam',
               loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
 print("training")
 with mlflow.start_run() as run:
-    history = model.fit(train_data.shuffle(10000).batch(512),
-                        epochs=1,
-                        validation_data=validation_data.batch(512),
+    history = model.fit(X_train_transformed,y_train,
+                        epochs=10,
+                        validation_data=(X_val_transformed,y_val),
                         verbose=1)
 
-    results = model.evaluate(test_data.shuffle(10000).batch(512))
+    results = model.evaluate(X_test_transformed,y_test)
+    mlflow.log_artifact(filename)
     mlflow.log_metric("test_loss", results[0])
     mlflow.log_metric("test_accuracy", results[1])
 print("test loss, test acc:", results)
-
 compare(run.info.run_uuid,name='text')  
-print('fin')

@@ -185,7 +185,7 @@ def update_model(new_run_id,obj,name,url):
     date = datetime.datetime.now()
     f_name = str(date.strftime("%m-%d-%y_%X"))
     f_name = f_name.replace(":","-")
-    zipdirectory(f_name + '.zip', './mlruns/0/' + new_run_id + '/artifacts/model')
+    zipdirectory(f_name + '.zip', './mlruns/0/' + new_run_id + '/artifacts/')
     obj.FileUpload(f_name + '.zip')
     os.remove(f_name + '.zip')
     data = json.dumps({"signature_name": "serving_default", "name": f_name + '.zip', "version": str(new_run_id),'type':str(type)})
@@ -194,13 +194,16 @@ def update_model(new_run_id,obj,name,url):
     return json_response
   
 def compare(new_run_id, metric='test_accuracy',name='image', url='http://127.0.0.1:5001'):
+    
     obj = DriveAPI()
     json_response = requests.get(f'{url}/version/{name}')
     old_run_id = json_response.text
+    print(old_run_id)
     new_run_info = mlflow.get_run(run_id=new_run_id)
 
     if old_run_id == "null":
         update_model(new_run_id, obj,name,url)
+        
         return
 
 
