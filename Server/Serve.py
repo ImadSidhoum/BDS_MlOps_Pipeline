@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Response, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 from pydantic import BaseModel
 import json
@@ -22,12 +23,33 @@ class List_Models():
     def __init__(self):
         self.models = {}
 
+class List_Pipelines():
+    def __init__(self):
+        self.pipelines = {}
+
+class Pipeline():
+    def __init__(self):
+        self.graph = {}
+    
+    def parcours(self, foo=lambda x: x):
+        self.graph = self._parcours(self.graph, foo)
+    
+    def _parcours(self,elt, foo=lambda x: x):
+        print(elt["name"])
+        elt = foo(elt)
+        if "children" in elt:
+            for i, child in enumerate(elt["children"]):
+                elt["children"][i] = self._parcours(child, foo)
+        return elt
+
+
 # Initialisation
 app = FastAPI()
 obj = DriveAPI()
 
 # init model
 list_models = List_Models()
+list_pipelines = List_Pipelines()
 
 # requets
 class Item(BaseModel):
@@ -38,15 +60,18 @@ class Item_uri(BaseModel):
     name: str
     version: str
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['http://localhost:3000'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 @app.get('/')
 async def index():
     return "Server Up"
-
-#@app.get('/yaml')
-#async def get_yaml():
-#with open('meta_data_image.yml', 'w') as outfile:
-#            yaml.dump(meta_data, outfile, default_flow_style=False)
-
 
 
 @app.post('/update/{name}')
@@ -63,7 +88,10 @@ async def model_update(item: Item_uri, name):
     os.remove(f_name)
     
     list_models.models[name].model = mlflow.pyfunc.load_model(name+'/model')
-    list_models.models[name].preprocess = pickle.load(open(name+'/preprocessing.pkl','r'))
+    try:
+        list_models.models[name].preprocess = pickle.load(open(name+'/preprocessing.pkl','r'))
+    except:
+        print("no preprocessing")
     list_models.models[name].version = item.version
     list_models.models[name].name = f_name
     return "model updated"
@@ -75,7 +103,7 @@ async def predict(item: Item, name):
     filename = str(date.strftime("%m-%d-%y_%X"))
     filename = filename.replace(":","-")
     if name =='image':
-        filehandler = open('Data/image/'+filename, 'w')
+        filehandler = open('Data/image/'+filename, 'w') # wtf => a mettre dans le nom du truc ou pipeline
         pickle.dump(data, filehandler)
     else:
         filehandler = open('Data/text/'+filename, 'w')
@@ -108,8 +136,11 @@ async def set_yaml(file: UploadFile = File(...)):
         dezip(f_name, name)
         os.remove(f_name)
 
-        list_models.models[name].model = mlflow.pyfunc.load_model(name)
-        list_models.models[name].preprocess = pickle.load(open(name+'/preprocessing.pkl','r'))
+        list_models.models[name].model = mlflow.pyfunc.load_model(name+'/model')
+        try:
+            list_models.models[name].preprocess = pickle.load(open(name+'/preprocessing.pkl','r'))
+        except:
+            print("no preprocessing")
         list_models.models[name].version =meta_data[name]["version"]
         list_models.models[name].name = f_name
     return "new config set"
@@ -131,3 +162,31 @@ async def get_yaml():
     f = open("config.yml", "r")
     return f.read()
 
+@app.post('/pipeline/set/{name}')
+async def set_pipe(name, file: UploadFile = File(...)):
+    contents = await file.read()
+    new_pipe = Pipeline()
+    js = contents.decode('utf8').replace("'", '"')
+    new_pipe.graph = json.loads(js)
+    list_pipelines.pipelines[name] = new_pipe
+
+    def add_xy(elt): #pour graph react
+        elt["textProps"] = {"x": -25, "y": 25}
+        return elt
+    
+    new_pipe.parcours(add_xy)
+
+    def add_info(elt):
+        if elt["name"] in list_models.models:
+            elt["version"] = list_models.models[elt["name"]].version
+        return elt
+
+    new_pipe.parcours(add_info)
+
+    return "new pipepile set"
+
+@app.get('/pipeline/{name}')
+async def get_pipe(name):
+    if name in list_pipelines.pipelines:
+        return list_pipelines.pipelines[name].graph
+    return None

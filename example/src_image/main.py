@@ -81,5 +81,5 @@ with mlflow.start_run() as run:
     mlflow.log_metric("test_accuracy", results[1])
 print("test loss, test acc:", results)
 
-compare(run.info.run_uuid,name='image')  
+compare(run.info.run_uuid,name='image', url="http://127.0.0.1:5002")  
 print('fin')

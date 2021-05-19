@@ -21,12 +21,13 @@ import mlflow
 
 
 def zipdirectory(filezip, pathzip):
-    lenpathparent = len(pathzip)+1   ## utile si on veut stocker les chemins relatifs
+    lenpathparent = len(pathzip)#+1   ## utile si on veut stocker les chemins relatifs
     def _zipdirectory(zfile, path):
-        for i in glob.glob(path+'\\*'):
-            if os.path.isdir(i): _zipdirectory(zfile, i )
+        for i in glob.glob(path+"*"):#+'\\*'):
+            if os.path.isdir(i): 
+                _zipdirectory(zfile, i+"/" )
             else:
-
+                # print(i[lenpathparent:], lenpathparent , pathzip)
                 zfile.write(i, i[lenpathparent:]) ## zfile.write(i) pour stocker les chemins complets
     zfile = zipfile.ZipFile(filezip,'w',compression=zipfile.ZIP_DEFLATED)
     _zipdirectory(zfile, pathzip)

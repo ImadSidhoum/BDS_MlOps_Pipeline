@@ -1,0 +1,12 @@
+{"name": 'Parent',
+"children": [{
+    "name": 'image',
+    "children":[{
+        "name": 'model'
+    },{
+        "name": 'model2'
+    }]
+}, {
+    "name": 'Child Two'
+}]
+}
