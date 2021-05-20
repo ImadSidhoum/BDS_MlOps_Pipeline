@@ -1,0 +1,96 @@
+.allocation{
+    background: $color-1;
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.allo_grid
+{
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: 1fr 1fr;
+
+    .img_loader
+    {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* align horizontal */
+        align-items: center;
+        margin: 30px 0px;
+
+        img {
+            border-radius: 10px;
+            margin: 5px;
+            height: 100px;
+            box-shadow: 3px 2px 20px 0px $color-4;
+            // padding: 10px 0;
+        }
+        input{
+            padding: 10px;
+            // width: 200px;
+            font-size: 0.8rem;
+        }
+    }
+    
+}
+
+.stats{
+    display: flex;
+    flex-direction: column;
+    background: $color-5;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 1.2rem;
+
+    .content
+    {
+        background: $color-1;
+        margin: 10px;
+        border-radius: 10px;
+        padding: 10px;
+    }
+}
+
+.button {
+    display: inline-block;
+    border-radius: 4px;
+    background-color: $color-5;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 14px;
+    padding: 10px;
+    width: 100px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+    box-shadow: 2px 2px 8px 0px $color-4;
+
+    span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s
+    }
+}
+
+
+.button:hover {
+    span {
+    padding-right: 10px;
+    }
+
+    span:after {
+        opacity: 1;
+        right: 0;
+    }
+}

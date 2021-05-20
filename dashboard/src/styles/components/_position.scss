@@ -1,0 +1,25 @@
+.position{
+    grid-column: span 2;
+    background: $color-1;
+    border-radius: 15px;
+    padding: 10px;
+
+    .list-img
+    {
+        position: flex;
+        flex-direction: column;
+        // background: blue;
+
+        img{
+            height: 110px;
+            border-radius: 10px;
+            border-color: red;
+            border-style: solid;
+            margin-right: 10px;
+        }
+
+        .img-ok{
+            border-color: green;
+        }
+    }
+}

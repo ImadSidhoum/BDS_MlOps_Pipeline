@@ -1,0 +1,33 @@
+.board {
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: 225px auto 200px;
+    grid-template-rows: auto 180px;
+
+    // height: 100vh;
+    // width: 100vw;
+    // overflow: hidden;
+    grid-column: span 2;
+    margin: 10px;
+    font-size: 1.5rem;
+    color:$color-5;
+  }
+
+@media (max-width: 750px) {
+    .board {
+        grid-template-columns: 225px auto;
+        grid-template-rows: auto auto auto;
+    }
+    .positions {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 500px) {
+    .board {
+        grid-template-columns: auto;
+    }
+    .positions {
+        grid-column: span 1;
+    }
+}

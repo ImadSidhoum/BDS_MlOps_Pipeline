@@ -1,0 +1,90 @@
+div.custom-container {
+	background-color: $color-4;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+svg.custom{
+    height: 400;
+    width: 600;
+}
+
+svg.custom .node circle {
+	fill: $color-1;
+	stroke: $color-5;
+	stroke-width: 1.5px;
+}
+
+svg.custom .node text {
+	font-size: 11px;
+	background-color: #444;
+	fill: #F4F4F4;
+	text-shadow: 0 1px 4px black;
+}
+
+svg.custom .node {
+	cursor: pointer;
+}
+
+svg.custom path.link {
+	fill: none;
+	stroke: $color-5;
+	stroke-width: 3px;
+}
+
+.input-containers{
+    margin: 10px;
+    display: flex;
+    // padding: 4px;
+}
+
+.ant-input-group{
+    width: 40%;
+}
+
+.ant-btn-primary
+{
+    border-color:$color-5;
+    background:$color-5;
+}
+
+.ant-btn-primary:focus {
+    border-color:$color-5;
+    background:$color-5;
+}
+
+.ant-btn-primary:hover
+{
+    border-color:#18cab5;
+    background:#18cab5;
+}
+
+.info-container{
+    margin: 10px 0;
+    padding: 5px;
+    border-radius: 5px;
+    border-color: $color-5;
+    border-style: dashed;
+}
+
+.nodeInfo{    
+    span{
+        background: $color-5;
+        border-radius: 5px;
+        color: $color-1;
+        padding: 2px;
+    }
+}
+
+.version-container{
+    font-size: 1rem;
+    margin: 5px 0;
+    color: $color-4;
+}
+.predict-btn
+{
+    .ant-btn{
+        position: absolute; 
+        right: 15px;
+    }
+}

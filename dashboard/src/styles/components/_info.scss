@@ -1,0 +1,30 @@
+.info{
+    grid-row: span 2;
+    background-color: $color-1;
+    border-radius: 15px;
+    padding: 10px;
+    
+    .sub-div
+    {
+        // background: blue;
+        margin: 10px 0;
+        padding: 5px;
+        font-size: 1.2rem;
+        border-radius: 5px;
+        border-color: $color-5;
+        border-style: dashed;
+
+        li{
+            font-size: 1rem;
+            margin: 5px;
+            color: $color-4;
+        }
+
+        span{
+            background: $color-5;
+            border-radius: 5px;
+            color: $color-1;
+            padding: 2px;
+        }
+    }
+}
