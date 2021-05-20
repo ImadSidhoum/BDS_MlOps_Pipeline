@@ -1,3 +1,15 @@
 image:
   name: 05-19-21_15-08-55.zip
   version: d9e4c009ec4b4c85a523cc63404cc7b0
+model_1:
+  name: 05-19-21_23-17-31.zip
+  version: 67911d9dbafe40e8a72baa52dffd2d61
+model_2:
+  name: 05-19-21_23-19-17.zip
+  version: efc5e0f7dc434c0d8b3030f5d1ed6dbb
+preprocessing:
+  name: 05-19-21_23-16-37.zip
+  version: 62cf0dc111ab42218cdf1f45681f5d6b
+valid:
+  name: 05-19-21_23-22-13.zip
+  version: 88ca1621bc18449ab0c503bb55a70f98

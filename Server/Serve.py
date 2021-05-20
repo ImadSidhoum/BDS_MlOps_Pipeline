@@ -18,6 +18,7 @@ class Model():
         self.model = None
         self.name = None
         self.preprocess = None
+        self.summary= None
 
 class List_Models():
     def __init__(self):
@@ -94,6 +95,7 @@ async def model_update(item: Item_uri, name):
         print("no preprocessing")
     list_models.models[name].version = item.version
     list_models.models[name].name = f_name
+    list_models.models[name].summary = open(name+"/model_summary.txt", "r").read()
     return "model updated"
 
 @app.post('/predict/{name}')
@@ -143,6 +145,7 @@ async def set_yaml(file: UploadFile = File(...)):
             print("no preprocessing")
         list_models.models[name].version =meta_data[name]["version"]
         list_models.models[name].name = f_name
+        list_models.models[name].summary = open(name+"/model_summary.txt", "r").read()
     return "new config set"
 
 
@@ -179,6 +182,8 @@ async def set_pipe(name, file: UploadFile = File(...)):
     def add_info(elt):
         if elt["name"] in list_models.models:
             elt["version"] = list_models.models[elt["name"]].version
+            elt["file"] = list_models.models[elt["name"]].name
+            elt["summary"] = list_models.models[elt["name"]].summary
         return elt
 
     new_pipe.parcours(add_info)

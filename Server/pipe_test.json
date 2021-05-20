@@ -1,12 +1,12 @@
-{"name": 'Parent',
+{"name": 'valid',
 "children": [{
-    "name": 'image',
+    "name": 'preprocessing',
     "children":[{
-        "name": 'model'
+        "name": 'model_1'
     },{
-        "name": 'model2'
+        "name": 'model_2'
     }]
 }, {
-    "name": 'Child Two'
+    "name": 'image'
 }]
 }
